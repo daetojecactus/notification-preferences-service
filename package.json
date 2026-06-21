@@ -17,13 +17,21 @@
     "test:watch": "jest --watch",
     "test:cov": "jest --coverage",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
-    "test:e2e": "jest --config ./test/jest-e2e.json"
+    "test:e2e": "jest --config ./test/jest-e2e.json",
+    "prisma:generate": "prisma generate --config=src/modules/infrastructure/database/prisma.config.ts",
+    "prisma:migrate": "prisma migrate dev --config=src/modules/infrastructure/database/prisma.config.ts",
+    "prisma:deploy": "prisma migrate deploy --config=src/modules/infrastructure/database/prisma.config.ts",
+    "prisma:seed": "ts-node src/modules/infrastructure/database/seed.ts",
+    "docker:up": "docker compose up -d",
+    "docker:down": "docker compose down"
   },
   "dependencies": {
     "@nestjs/common": "^11.0.1",
     "@nestjs/core": "^11.0.1",
     "@nestjs/platform-express": "^11.0.1",
+    "@prisma/adapter-pg": "^7.8.0",
     "@prisma/client": "^7.8.0",
+    "@prisma/client-runtime-utils": "7.8.0",
     "class-transformer": "^0.5.1",
     "class-validator": "^0.15.1",
     "dotenv": "^17.4.2",
@@ -69,6 +77,9 @@
     "testRegex": ".*\\.spec\\.ts$",
     "transform": {
       "^.+\\.(t|j)s$": "ts-jest"
+    },
+    "moduleNameMapper": {
+      "^src/(.*)$": "<rootDir>/$1"
     },
     "collectCoverageFrom": [
       "**/*.(t|j)s"

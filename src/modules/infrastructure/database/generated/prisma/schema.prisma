@@ -1,0 +1,89 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "./generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum NotificationType {
+  TRANSACTIONAL_EMAIL
+  MARKETING_EMAIL
+  TRANSACTIONAL_SMS
+  MARKETING_SMS
+  TRANSACTIONAL_PUSH
+  MARKETING_PUSH
+  TRANSACTIONAL_MESSENGER
+  MARKETING_MESSENGER
+
+  @@map("notification_type")
+}
+
+enum Channel {
+  EMAIL
+  SMS
+  PUSH
+  MESSENGER
+
+  @@map("channel")
+}
+
+enum PolicyAction {
+  DENY
+
+  @@map("policy_action")
+}
+
+model DefaultPreference {
+  id               String           @id @default(uuid(7)) @db.Uuid
+  notificationType NotificationType @map("notification_type")
+  channel          Channel
+  enabled          Boolean          @default(true)
+  createdAt        DateTime         @default(now()) @map("created_at")
+  updatedAt        DateTime         @updatedAt @map("updated_at")
+
+  @@unique([notificationType, channel])
+  @@map("default_preference")
+}
+
+model UserPreference {
+  id               String           @id @default(uuid(7)) @db.Uuid
+  userId           String           @map("user_id")
+  notificationType NotificationType @map("notification_type")
+  channel          Channel
+  enabled          Boolean
+  createdAt        DateTime         @default(now()) @map("created_at")
+  updatedAt        DateTime         @updatedAt @map("updated_at")
+
+  @@unique([userId, notificationType, channel])
+  @@map("user_preference")
+}
+
+model UserQuietHours {
+  id        String   @id @default(uuid(7)) @db.Uuid
+  userId    String   @unique @map("user_id")
+  startTime DateTime @map("start_time") @db.Time
+  endTime   DateTime @map("end_time") @db.Time
+  timezone  String   @db.VarChar(100)
+  enabled   Boolean  @default(true)
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("user_quiet_hours")
+}
+
+model GlobalPolicy {
+  id               String            @id @default(uuid(7)) @db.Uuid
+  notificationType NotificationType? @map("notification_type")
+  channel          Channel?
+  region           String?           @db.VarChar(10)
+  action           PolicyAction      @default(DENY)
+  reason           String            @db.VarChar(500)
+  isActive         Boolean           @default(true) @map("is_active")
+  createdAt        DateTime          @default(now()) @map("created_at")
+  updatedAt        DateTime          @updatedAt @map("updated_at")
+
+  @@index([notificationType, channel, region])
+  @@map("global_policy")
+}
